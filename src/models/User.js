@@ -1,67 +1,66 @@
-const mongoose = require('mongoose')
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../config/db');
 const bcrypt = require('bcrypt');
+
 const SALT_ROUNDS = 10;
 
-const userSchema = new mongoose.Schema({
-    firstName: { 
-      type: String, 
-      required: true,
-      trim: true,
+class User extends Model {
+  async comparePassword(plainPassword) {
+    return bcrypt.compare(plainPassword, this.password);
+  }
+}
+
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    lastName: { 
-      type: String, 
-      required: true,
-      trim: true,
+    firstName: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    lastName: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     email: {
-      type: String,
-      required: true,
+      type: DataTypes.STRING(100),
+      allowNull: false,
       unique: true,
-      lowercase: true,
-      validate: {
-        validator: function(v) {
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-        },
-        message: props => `${props.value} is not a valid email!`
-      }
+      validate: { isEmail: true },
     },
     password: {
-      type: String,
-      required: true,
-      select: false,
-      minlength: [8, 'Password must be at least 8 characters'],
+      type: DataTypes.STRING(255),
+      allowNull: false,
     },
     phoneNumber: {
-      type: String,
-      required: true,
-      validate: {
-        validator: function(v) {
-          return /^\+?\d{10,15}$/.test(v);
-        },
-        message: props => `${props.value} is not a valid phone number!`
-      }
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      validate: { is: /^\+?\d{10,15}$/ },
     },
-    userType: { 
-      type: Number, 
-      required: true,
-      enum: [1, 2]
+    userType: {
+      type: DataTypes.ENUM('user', 'salon_owner'),
+      allowNull: false,
     },
-    salonId: { type: Number, required: false },
-  }, { timestamps: true });
+  },
+  {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
+    timestamps: true,
+    hooks: {
+      beforeCreate: async (user) => {
+        user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
+      },
+      beforeUpdate: async (user) => {
+        if (user.changed('password')) {
+          user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
+        }
+      },
+    },
+  }
+);
 
-  userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    try {
-      const hashed = await bcrypt.hash(this.password, SALT_ROUNDS);
-      this.password = hashed;
-      next();
-    } catch (error) {
-      next(error);
-    }
-  });
-  
-  userSchema.methods.comparePassword = async function (plainPassword) {
-    return await bcrypt.compare(plainPassword, this.password);
-  };
-
-module.exports = mongoose.model('User', userSchema)
+module.exports = User;

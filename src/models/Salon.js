@@ -1,18 +1,81 @@
-const mongoose = require('mongoose')
+const { DataTypes, Model } = require('sequelize');
+const sequelize = require('../config/db');
 
-const salonSchema = new mongoose.Schema({
-    name: {type: String, required: true},
-    description: {type: String, required: true},
-    address: {type: String, required: true},
-    city: {type: String, required: true},
-    state: {type: String, required: true},
-    category: {type: String, required: true},
-    image: {type: String, required: true},
-    rating: {type: Number, required: true},
-    reviewCount: {type: Number, required: true},
-    phone: {type: String, required: true},
-    services: {type: [String], required: true},
-    specialties: {type: [String], required: true},
-    isOpen: {type: Boolean, required: true},
-    distance: {type: String, required: true}
-})
+class Salon extends Model {}
+
+Salon.init(
+  {
+    userId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+      field: 'user_id',
+    },
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    city: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    state: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    category: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    rating: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    reviewCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
+    phone: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+    },
+    services: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
+    specialties: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
+    isOpen: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    distance: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Salon',
+    tableName: 'salons',
+    timestamps: true,
+  }
+);
+
+module.exports = Salon;
