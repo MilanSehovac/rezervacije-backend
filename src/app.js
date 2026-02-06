@@ -4,6 +4,7 @@ const cors = require('cors');
 const port = process.env.PORT;
 const app = express();
 const { sequelize } = require('./models');
+const cookieParser = require('cookie-parser');
 
 (async () => {
   try {
@@ -14,9 +15,13 @@ const { sequelize } = require('./models');
   }
 })();
 
-app.use(cors());
+app.use(cors({
+  origin: `http://localhost:3000`,
+  credentials:true
+}));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
+app.use(cookieParser());
 
 app.use('/api/users', require('./Routes/userRoutes'))
 app.use('/api/salons', require('./Routes/salonRoutes'))
