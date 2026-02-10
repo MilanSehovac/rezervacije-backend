@@ -96,14 +96,16 @@ exports.userLogin = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'userType']
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'state','city' ,'address','zipcode','userType', 'createdAt']
     });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
-    res.json(user);
+    res.json({
+      user,
+      salon: user.salon || null
+    });
 
   } catch (err) {
     console.error('Error in getMe:', err);
@@ -115,3 +117,45 @@ exports.logout = async (req, res) => {
   res.clearCookie('refreshToken');
   res.json({ message: 'Logged out' });
 };
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.id 
+    const {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      address,
+      city,
+      state,
+      zipCode
+    } = req.body
+    
+    const user = await User.findByPk(userId)
+
+    if (!user){
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    await user.update({
+      firstName,
+      lastName,
+      email,
+      phone: phoneNumber,
+      address,
+      city,
+      state,
+      zipCode
+    })
+
+    res.json({
+      message: 'Profile updated successfully',
+      user
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error updating user profile' });
+  }
+}

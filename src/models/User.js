@@ -44,12 +44,42 @@ User.init(
       type: DataTypes.ENUM('user', 'salon_owner'),
       allowNull: false,
     },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    state: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    zipcode: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+    },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+
   },
   {
     sequelize,
     modelName: 'User',
     tableName: 'users',
     timestamps: true,
+    defaultScope:{
+      where: {
+        is_deleted: false,
+      }
+    },
+    scopes: {
+      deleted: {where:{is_deleted:true}},
+      all: {where: {}},
+    },
     hooks: {
       beforeCreate: async (user) => {
         user.password = await bcrypt.hash(user.password, SALT_ROUNDS);
@@ -62,5 +92,4 @@ User.init(
     },
   }
 );
-
 module.exports = User;

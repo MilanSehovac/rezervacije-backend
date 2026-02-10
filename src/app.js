@@ -24,7 +24,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(cookieParser());
 
 app.use('/api/users', require('./Routes/userRoutes'))
-app.use('/api/salons', require('./Routes/salonRoutes'))
+app.use('/api/salon', require('./Routes/salonRoutes'))
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

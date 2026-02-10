@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const User = require('./User');
 
 class Salon extends Model {}
 
@@ -77,5 +78,8 @@ Salon.init(
     timestamps: true,
   }
 );
+
+Salon.belongsTo(User, {as: 'owner', foreignKey:'userId'} );
+User.hasOne(Salon, {as: 'salon', foreignKey:'userId'});
 
 module.exports = Salon;

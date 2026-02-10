@@ -10,6 +10,6 @@ exports.authenticate = (req, res, next) => {
         next();
     } catch (err) {
         console.error(err);
-        res.status(401).json({error: 'Invalid token'})
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 }
