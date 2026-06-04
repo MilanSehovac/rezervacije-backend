@@ -25,6 +25,7 @@ app.use(cookieParser());
 
 app.use('/api/users', require('./Routes/userRoutes'))
 app.use('/api/salon', require('./Routes/salonRoutes'))
+app.use('/api/bookings', require('./Routes/bookingRoutes'))
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

@@ -1,4 +1,5 @@
 const User = require('../models/User')
+const { Salon } = require('../models')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -96,7 +97,8 @@ exports.userLogin = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'state','city' ,'address','zipcode','userType', 'createdAt']
+      attributes: ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'state', 'city', 'address', 'zipcode', 'userType', 'createdAt'],
+      include: [{ model: Salon, as: 'salon' }]
     });
 
     if (!user) {
@@ -129,7 +131,7 @@ exports.updateUserProfile = async (req, res) => {
       address,
       city,
       state,
-      zipCode
+      zipcode
     } = req.body
     
     const user = await User.findByPk(userId)
@@ -142,11 +144,11 @@ exports.updateUserProfile = async (req, res) => {
       firstName,
       lastName,
       email,
-      phone: phoneNumber,
+      phoneNumber,
       address,
       city,
       state,
-      zipCode
+      zipcode
     })
 
     res.json({

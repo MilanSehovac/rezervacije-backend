@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router()
-const {getSalon, createSalon} = require('../controllers/salonController')
-const { salonOwnerOnly } = require('../middleware/salon');
+const {getSalonById, createSalon, getAllSalons} = require('../controllers/salonController')
+const { getSalonAvailability } = require('../controllers/availabilityController')
+const {authenticate} = require('../middleware/auth')
 
-router.get('/', getSalon)
-router.post('/create', salonOwnerOnly ,createSalon)
+router.get('/:id/availability', getSalonAvailability)
+router.get('/:id', getSalonById)
+router.get('/', getAllSalons)
+router.post('/create', authenticate ,createSalon)
 
 module.exports = router
