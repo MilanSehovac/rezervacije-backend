@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
+const { parseJson } = require('../services/scheduler');
 class Booking extends Model {}
 
 Booking.init(
@@ -10,13 +11,14 @@ Booking.init(
       primaryKey: true,
     },
     salonId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
       field: 'salon_id',
     },
     customerId: {
+      // null for bookings the salon entered by hand (walk-ins, phone calls)
       type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
+      allowNull: true,
       field: 'customer_id',
     },
     serviceId: {
@@ -47,6 +49,17 @@ Booking.init(
     note: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    guestName: { type: DataTypes.STRING(100), allowNull: true },
+    guestPhone: { type: DataTypes.STRING(30), allowNull: true },
+    source: { type: DataTypes.ENUM('online', 'manual'), allowNull: false, defaultValue: 'online' },
+    // { phases, canOverlap, requiredSeats, staffIds } snapshot taken when the booking was made
+    schedule: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      get() {
+        return parseJson(this.getDataValue('schedule'), null);
+      },
     },
   },
   {

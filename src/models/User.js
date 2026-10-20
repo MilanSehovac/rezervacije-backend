@@ -41,7 +41,7 @@ User.init(
       validate: { is: /^\+?\d{10,15}$/ },
     },
     userType: {
-      type: DataTypes.ENUM('user', 'salon_owner'),
+      type: DataTypes.ENUM('user', 'salon_owner', 'admin'),
       allowNull: false,
     },
     address: {
@@ -59,6 +59,16 @@ User.init(
     zipcode: {
       type: DataTypes.STRING(20),
       allowNull: true,
+    },
+    notificationPrefs: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      field: 'notification_prefs',
+      get() {
+        const raw = this.getDataValue('notificationPrefs');
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        return { reminders: true, statusUpdates: true, ...(parsed || {}) };
+      },
     },
     is_deleted: {
       type: DataTypes.BOOLEAN,
